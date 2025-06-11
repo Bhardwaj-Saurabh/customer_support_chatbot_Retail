@@ -9,5 +9,6 @@ dependencies = [
     "langchain-openai>=0.3.22",
     "langchain-qdrant>=0.2.0",
     "langgraph>=0.4.8",
+    "loguru>=0.7.3",
     "python-dotenv>=1.1.0",
 ]
