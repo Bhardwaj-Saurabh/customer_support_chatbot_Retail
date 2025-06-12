@@ -33,10 +33,14 @@ class Settings(BaseSettings):
     # --- MongoDB Atlas Configuration ---
     QDRANT_DATABASE_NAME: str = Field(
         default="customer_support_klnowledge_base",
-        description="Name of the QDRANTDB database.",
+        description="Name of the QdrantDB database.",
     )
     QDRANT_URI: str = Field(
         description="Connection URI for the local MongoDB Atlas instance.",
+    )
+    
+    QDRANT_API_KEY = Field(
+        description="API key for QdrantDB service authentication.",
     )
 
     # --- OpenAI API Configuration ---
