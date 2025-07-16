@@ -33,12 +33,12 @@ async def evaluation_task(x: dict) -> dict:
             expected_output: Expected answer for comparison
     """
 
-    input_messages = x["customer_query"][:-1]
-    expected_output_message = x["customer_query"][-1]
+    input_messages = x["question"]
+    expected_output_message = x["answer"]
 
     response, latest_state = await get_response(
         messages=input_messages,
-        user_id=user_id,
+        user_id="Saurabh",
         new_thread=True,
     )
     context = state_to_str(latest_state)
