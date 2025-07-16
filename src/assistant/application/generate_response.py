@@ -42,14 +42,14 @@ async def get_streaming_response(
             writes_collection_name=settings.MONGO_STATE_WRITES_COLLECTION,
         ) as checkpointer:
             graph = graph_builder.compile(checkpointer=checkpointer)
-            # opik_tracer = OpikTracer(graph=graph.get_graph(xray=True))
+            opik_tracer = OpikTracer(graph=graph.get_graph(xray=True))
 
             thread_id = (
                 user_id if not new_thread else f"{user_id}-{uuid.uuid4()}"
             )
             config = {
                 "configurable": {"thread_id": thread_id},
-                # "callbacks": [opik_tracer],
+                "callbacks": [opik_tracer],
             }
 
             async for chunk in graph.astream(

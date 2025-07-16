@@ -1,5 +1,4 @@
 import os
-from langchain_core.prompts import ChatPromptTemplate
 from typing import Dict
 
 from dotenv import load_dotenv
@@ -18,7 +17,7 @@ vector_store = vectorstore()
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-llm = ChatOpenAI(model="gpt-4.1-mini", temperature=0)
+llm = ChatOpenAI(model="gpt-4.1-mini", temperature=0, stream_usage=True)
 
 def categorize_inquiry(support_state: CustomerSupportAgentState) -> CustomerSupportAgentState:
     """

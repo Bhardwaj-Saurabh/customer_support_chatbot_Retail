@@ -1,6 +1,6 @@
 import opik
 from loguru import logger
-
+from langchain_core.prompts import ChatPromptTemplate
 
 class Prompt:
     def __init__(self, name: str, prompt: str) -> None:
