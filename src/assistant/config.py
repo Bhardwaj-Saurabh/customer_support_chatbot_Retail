@@ -21,14 +21,23 @@ class Settings(BaseSettings):
         description="Project name for Comet ML and Opik tracking.",
     )
 
-    # --- Hugging Face Configuration ---
-    HUGGINGFACE_ACCESS_TOKEN: str | None = Field(
-        default=None, description="Access token for Hugging Face API authentication."
+    # --- MongoDB Configuration ---
+    MONGO_URI: str = Field(
+        default="mongodb+srv://saurabhbhardwaj:saurabh27@saurabh-cluster.cuixean.mongodb.net/",
+        description="Connection URI for the local MongoDB Atlas instance.",
     )
-    HUGGINGFACE_DEDICATED_ENDPOINT: str | None = Field(
-        default=None,
-        description="Dedicated endpoint URL for real-time inference."
-    )
+    MONGO_DB_NAME: str = "saurabh-cluster"
+    MONGO_STATE_CHECKPOINT_COLLECTION: str = "assistant_state_checkpoints"
+    MONGO_STATE_WRITES_COLLECTION: str = "assistant_state_writes"
+    MONGO_LONG_TERM_MEMORY_COLLECTION: str = "assistant_long_term_memory"
+
+    # --- Agents Configuration ---
+    TOTAL_MESSAGES_SUMMARY_TRIGGER: int = 30
+    TOTAL_MESSAGES_AFTER_SUMMARY: int = 5
+
+    # --- RAG Configuration ---
+    RAG_TEXT_EMBEDDING_MODEL_ID: str = "text-embedding-3-small"
+    RAG_TOP_K: int = 3
 
     # --- MongoDB Atlas Configuration ---
     QDRANT_DATABASE_NAME: str = Field(
@@ -39,7 +48,7 @@ class Settings(BaseSettings):
         description="Connection URI for the local MongoDB Atlas instance.",
     )
     
-    QDRANT_API_KEY = Field(
+    QDRANT_API_KEY: str = Field(
         description="API key for QdrantDB service authentication.",
     )
 

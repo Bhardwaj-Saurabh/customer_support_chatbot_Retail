@@ -1,8 +1,18 @@
+import os
 from langchain_core.prompts import ChatPromptTemplate
 from typing import Dict
-from assistant.application.agents.state import CustomerSupportAgentState
+from assistant.application.agents.state import CustomerSupportAgentState, QueryCategory, QuerySentiment
+from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
+from assistant.infrastructure.qdrant.service import vectorstore
 
+vector_store = vectorstore()
 
+load_dotenv()
+
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+llm = ChatOpenAI(model="gpt-4.1-mini", temperature=0)
 
 def categorize_inquiry(support_state: CustomerSupportAgentState) -> CustomerSupportAgentState:
     """
@@ -59,7 +69,7 @@ def generate_department_response(support_state: CustomerSupportAgentState) -> Cu
     """
     # Retrieve category and ensure it is lowercase for metadata filtering
     categorized_topic = support_state["query_category"]
-    query = support_state["customer_query"]
+    query = support_state["customer_query"][0].content
 
     # Use metadata filter for department - specific queries
     if categorized_topic == ['HR', 'IT_SUPPORT', 'FACILITY_AND_ADMIN', 'BILLING_AND_PAYMENT', 'SHIPPING_AND_DELIVERY']:
@@ -70,7 +80,7 @@ def generate_department_response(support_state: CustomerSupportAgentState) -> Cu
 
 
     # Perform retrieval from VectorDB
-    relevant_docs = qdrant_manager.similarity_search(
+    relevant_docs = vector_store.similarity_search(
                             query=query,
                             k=3,
                             filters=metadata_filter
@@ -148,43 +158,14 @@ def accept_user_input_oncall(support_state: CustomerSupportAgentState) -> Custom
     # REMEMBER: You can always customize the way you accept user input by modifying the code below
     # here we use jupyter widgets so you don't have to install too many external dependencies
 
-    global form_submitted  # status variable to track form submission
-    form_submitted = False # initially form hasn't been submitted
+    result = dict()
 
-    # UI Header: Display a title for the emergency form
-    header = widgets.HTML("<h3>Emergency Form - Please enter your details below:</h3>")
+    result['name'] = input('Please enter your name: ')
+    result['number'] = input('Please enter your number: ')
 
-    # Text input fields to collect critical user info
-    input1 = widgets.Text(description='Name:')     # User's full name
-    input2 = widgets.Text(description='Number:')   # Contact number (required for emergency callback)
-
-    # Dictionary to store the captured input values
-    result = {}
-
-    # Callback function executed when user clicks the Submit button
-    def on_submit(submit_button):
-        global form_submitted
-        form_submitted = True  # Form is now submitted
-        # Save form data to result dictionary
-        result['name'] = input1.value
-        result['number'] = input2.value
-        # Visual confirmation of submission
-        submit_button.description = '👍'
-
-    # Submit button widget setup
-    submit_button = widgets.Button(description="Submit")
-    submit_button.on_click(on_submit)  # Attach the callback function
-
-    # Combine widgets vertically and render in notebook
-    vbox = widgets.VBox([header, input1, input2, submit_button])
-    display(vbox)
-
-    # Keep polling for UI events until form is submitted
-    with ui_events() as poll:
-        while form_submitted is False:
-            poll(5)               # Monitor UI events
-            print('.', end='')   # Show a dot to indicate waiting for input from user
-            time.sleep(0.3)      # Slight delay to reduce CPU usage
+    while not (result['name'] and result['number']):
+        result['name'] = input('Please enter your name: ')
+        result['number'] = input('Please enter your number: ')
 
     # Return updated agent state with emergency form details
     return {

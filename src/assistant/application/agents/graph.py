@@ -56,4 +56,4 @@ def create_workflow_graph():
     return customer_support_graph
 
   # Compile the graph
-compiled_support_agent = customer_support_graph.compile(checkpointer=memory)
+# compiled_support_agent = create_workflow_graph().compile()
