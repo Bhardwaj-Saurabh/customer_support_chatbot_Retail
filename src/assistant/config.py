@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from loguru import logger
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -58,6 +60,9 @@ class Settings(BaseSettings):
     )
 
     EVALUATION_LLM: str = "gpt-4.1-mini"
+
+    KNOWLEDGE_DATASET_PATH: Path = Path("knowledge_base")
+    EVALUATION_DATASET_FILE_PATH: Path =Path("evaluation_data/evaluation_data.json")
 
     @field_validator("OPENAI_API_KEY")
     @classmethod
