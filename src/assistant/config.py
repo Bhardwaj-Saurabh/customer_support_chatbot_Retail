@@ -57,6 +57,8 @@ class Settings(BaseSettings):
         description="API key for OpenAI service authentication.",
     )
 
+    EVALUATION_LLM: str = "gpt-4.1-mini"
+
     @field_validator("OPENAI_API_KEY")
     @classmethod
     def check_not_empty(cls, value: str, info) -> str:

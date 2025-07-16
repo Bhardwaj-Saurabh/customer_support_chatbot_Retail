@@ -14,3 +14,15 @@ class QueryCategory(BaseModel):
 
 class QuerySentiment(BaseModel):
     sentiment: Literal['Positive', 'Neutral', 'Negative']
+
+
+def state_to_str(state: CustomerSupportAgentState) -> str:
+    if "final_response" in state and bool(state["final_response"]):
+        conversation = state["final_response"]
+    else:
+        conversation = ""
+
+
+    return f"""
+            conversation={conversation})
+            """
