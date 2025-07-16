@@ -2,8 +2,9 @@ from pathlib import Path
 
 import click
 
-from philoagents.application.evaluation import evaluate_agent, upload_dataset
-from philoagents.config import settings
+from assistant.application.evaluation.evaluate import evaluate_agent 
+from assistant.application.evaluation.upload_evaluation_data import upload_dataset
+from assistant.config import settings
 
 
 @click.command()

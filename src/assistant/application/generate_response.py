@@ -14,6 +14,57 @@ from assistant.application.agents.state import CustomerSupportAgentState
 from assistant.config import settings
 
 
+async def get_response(
+    messages: str | list[str] | list[dict[str, Any]],
+    user_id: str,
+    new_thread: bool = False,
+) -> tuple:
+    """Run a conversation through the workflow graph.
+
+    Args:
+        message: Initial message to start the conversation.
+        user_id: Unique identifier.
+
+    Returns:
+            - The final state after running the workflow.
+
+    Raises:
+        RuntimeError: If there's an error running the conversation workflow.
+    """
+
+    graph_builder = create_workflow_graph()
+
+    try:
+        async with AsyncMongoDBSaver.from_conn_string(
+            conn_string=settings.MONGO_URI,
+            db_name=settings.MONGO_DB_NAME,
+            checkpoint_collection_name=settings.MONGO_STATE_CHECKPOINT_COLLECTION,
+            writes_collection_name=settings.MONGO_STATE_WRITES_COLLECTION,
+        ) as checkpointer:
+            graph = graph_builder.compile(checkpointer=checkpointer)
+            opik_tracer = OpikTracer(graph=graph.get_graph(xray=True))
+
+            thread_id = (
+                user_id if not new_thread else f"{user_id}-{uuid.uuid4()}"
+            )
+            config = {
+                "configurable": {"thread_id": thread_id},
+                "callbacks": [opik_tracer],
+            }
+            output_state = await graph.ainvoke(
+                input={
+                    "customer_query": __format_messages(messages=messages),
+                },
+                config=config,
+            )
+        last_message = output_state["final_response"]
+        retrieved_content = output_state.get("retrieved_content", "")
+        return last_message.content, retrieved_content
+    except Exception as e:
+        raise RuntimeError(f"Error running conversation workflow: {str(e)}") from e
+
+
+
 async def get_streaming_response(
     messages: str | list[str] | list[dict[str, Any]],
     user_id: str,

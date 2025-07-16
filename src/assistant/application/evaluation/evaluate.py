@@ -36,17 +36,16 @@ async def evaluation_task(x: dict) -> dict:
     input_messages = x["question"]
     expected_output_message = x["answer"]
 
-    response, latest_state = await get_response(
+    response, retrieved_content = await get_response(
         messages=input_messages,
         user_id="Saurabh",
         new_thread=True,
     )
-    context = state_to_str(latest_state)
 
     return {
         "input": input_messages,
-        "context": context,
         "output": response,
+        "context": retrieved_content,
         "expected_output": expected_output_message,
     }
 

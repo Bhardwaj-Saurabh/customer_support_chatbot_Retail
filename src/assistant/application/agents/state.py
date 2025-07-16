@@ -8,6 +8,7 @@ class CustomerSupportAgentState(TypedDict):
     escalation_cust_info: dict
     oncall_cust_info: dict
     final_response: str
+    retrieved_content: str
 
 class QueryCategory(BaseModel):
     categorized_topic: Literal['HR', 'IT_SUPPORT', 'FACILITY_AND_ADMIN', 'BILLING_AND_PAYMENT', 'SHIPPING_AND_DELIVERY']

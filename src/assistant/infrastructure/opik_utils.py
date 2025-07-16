@@ -3,6 +3,7 @@ import os
 import opik
 from loguru import logger
 from opik.configurator.configure import OpikConfigurator
+from opik.rest_api.core.api_error import ApiError
 
 from assistant.config import settings
 
@@ -53,7 +54,15 @@ def get_dataset(name: str) -> opik.Dataset | None:
 def create_dataset(name: str, description: str, items: list[dict]) -> opik.Dataset:
     client = opik.Opik()
 
-    client.delete_dataset(name=name)
+    # Safely attempt to delete dataset if it exists
+    try:
+        client.delete_dataset(name=name)
+        print(f"[Opik] Deleted existing dataset: {name}")
+    except ApiError as e:
+        if e.status_code == 404:
+            print(f"[Opik] Dataset '{name}' not found. Proceeding to create it.")
+        else:
+            raise e  # Re-raise for other unexpected errors
 
     dataset = client.create_dataset(name=name, description=description)
     dataset.insert(items)

@@ -4,8 +4,9 @@ from typing import Dict
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from assistant.infrastructure.qdrant.service import vectorstore
+from langchain_core.messages import AIMessage, HumanMessage
 from assistant.application.agents.state import CustomerSupportAgentState, QueryCategory, QuerySentiment
-from assistant.application.domain.prompts import (
+from assistant.domain.prompts import (
     SENTIMENT_CATEGORY_PROMPT,
     RESPONSE_PROMPT,
     ROUTE_CATEGORY_PROMPT,
@@ -73,7 +74,7 @@ def generate_department_response(support_state: CustomerSupportAgentState) -> Cu
 
     # Update and return the modified support state
     return {
-        "final_response": reply
+        "final_response": reply, "retrieved_content": retrieved_content
     }
 
 def analyze_inquiry_sentiment(support_state: CustomerSupportAgentState) -> CustomerSupportAgentState:
@@ -96,14 +97,14 @@ def accept_user_input_oncall(support_state: CustomerSupportAgentState) -> Custom
     # REMEMBER: You can always customize the way you accept user input by modifying the code below
     # here we use jupyter widgets so you don't have to install too many external dependencies
 
-    result = dict()
+    user_name = input('Please enter your name: ')
+    user_phone_number = input('Please enter your number: ')
 
-    result['name'] = input('Please enter your name: ')
-    result['number'] = input('Please enter your number: ')
+    while not user_name and user_phone_number:
+        user_name = input('Please enter your name: ')
+        user_phone_number = input('Please enter your number: ')
 
-    while not (result['name'] and result['number']):
-        result['name'] = input('Please enter your name: ')
-        result['number'] = input('Please enter your number: ')
+    result = HumanMessage(content = f"{user_name} {user_phone_number}")
 
     # Return updated agent state with emergency form details
     return {
@@ -120,11 +121,11 @@ def escalate_to_oncall_team(support_state: CustomerSupportAgentState) -> Custome
     #  and telling them they will be contacted by a doctor from the on-call team
 
     # get the customer info from agent state which they entered in the form
-    oncall_cust_info = support_state['oncall_cust_info']
+    oncall_cust_info = support_state['oncall_cust_info'].content
     # the following response will be shown to the user and can also be sent (customer form inputs) to your on-call doctors
-    response = ("Don't worry " + oncall_cust_info['name'] +
+    response = AIMessage(content = "Don't worry " + oncall_cust_info.split()[0] +
                "!, someone from our on-call team will be reaching out to your shortly at " +
-                oncall_cust_info['number'] +
+                oncall_cust_info.split()[1] +
                 " for assistance immediately!")
 
     # NOTE: You can always add custom code here to call specific APIs like whatsapp to notify your on-call doctors
