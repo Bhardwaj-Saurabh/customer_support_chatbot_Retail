@@ -58,8 +58,9 @@ async def get_response(
                 config=config,
             )
         last_message = output_state["final_response"]
-        retrieved_content = output_state.get("retrieved_content", "")
-        return last_message.content, retrieved_content
+        print(last_message)
+        retrieved_content = output_state.get("retrieved_content", "Don't worry someone from our on-call team will be reaching out to your shortly at your number for assistance immediately!")
+        return last_message, retrieved_content
     except Exception as e:
         raise RuntimeError(f"Error running conversation workflow: {str(e)}") from e
 

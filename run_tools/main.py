@@ -17,24 +17,35 @@ def async_command(f):
 
     return wrapper
 
+@click.command()
+@click.option(
+    "--user-id",
+    type=str,
+    required=True,
+    help="ID of the User.",
+)
+@click.option(
+    "--query",
+    type=str,
+    required=True,
+    help="Query to call the agent with.",
+)
+
 
 @async_command
 async def main(user_id: str, query: str) -> None:
     """CLI command to query a philosopher.
 
     Args:
-        philosopher_id: ID of the philosopher to call.
+        user_id: ID of the User.
         query: Query to call the agent with.
     """
-    print("\033[32mResponse:\033[0m")
-    print("\033[32m--------------------------------\033[0m")
     async for chunk in get_streaming_response(
         messages=query,
         user_id=user_id,
     ):
         print(f"\033[32m{chunk}\033[0m", end="", flush=True)
-    print("\033[32m--------------------------------\033[0m")
 
 
 if __name__ == "__main__":
-    main(user_id = "saurabh", query = "How can I view my past orders and their billing details?")
+    main()
