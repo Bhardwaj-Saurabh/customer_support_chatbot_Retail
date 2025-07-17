@@ -4,7 +4,7 @@ A production-ready AI chatbot designed to support retail businesses using **Retr
 
 ## 🧠 Architecture
 
-![](static\image.png)
+![Architecture](static\image.png)
 
 ## 📂 Dataset
 
